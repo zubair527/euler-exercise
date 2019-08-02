@@ -1,5 +1,7 @@
 package com.euler.practise;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class ThreadingExercise implements Thread.UncaughtExceptionHandler {
 
   @Override
@@ -13,7 +15,12 @@ public class ThreadingExercise implements Thread.UncaughtExceptionHandler {
     Thread threadOne = new ThreadOne();
     RunnableOne runner = new RunnableOne();
     Thread threadTwo = new Thread(runner);
-    threadTwo.setUncaughtExceptionHandler();
+
+    // untill the new incremented (add 1) value is not provided it can't be interrupted.
+    // thread safe.
+    AtomicInteger aInt = new AtomicInteger(0);
+    long id = aInt.incrementAndGet();
+    long someValue = aInt.updateAndGet((x) -> Math.max(x, 4));
 
     // Java 8 way
     Runnable runnableTwo = () -> {
@@ -64,6 +71,7 @@ While Mobile OS usually does co-oparative scheduling.
         }
       } catch (InterruptedException e) {
         System.out.println("Exception: "+ e);
+
       }
     }
   }
@@ -71,6 +79,16 @@ While Mobile OS usually does co-oparative scheduling.
 //============================
 
   class ThreadOne extends Thread {
+
+    public  void myFunc(){
+      int a =0;
+      Object t = new Object();
+      synchronized(t){
+        notifyAll();
+        a = a +1;
+
+      }
+    }
 
     public void run() {
       for (int i = 0; i <= 100; ++i) {
